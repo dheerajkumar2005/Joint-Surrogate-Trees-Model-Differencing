@@ -5,7 +5,7 @@ import pandas as pd
 @dataclass
 class Rule:
     id: int
-    predicates: list
+    predicates: list #list of tuples (f,op,th) (str,str,float) 
     class_label: int
 
 
@@ -35,7 +35,7 @@ class Rule:
         return self.as_string()
     
     def as_dict(self,feature_names: list = None, total_region: dict = None, only_preds = False) -> dict:
-        if feature_names == None:
+        if feature_names is None:
             feature_names = []
             for pred in self.predicates:
                 f, _, _ = pred
@@ -64,6 +64,8 @@ class Rule:
                 elif op == '>=' or op == '>':
                     if th > lb:
                         lb = th
+                else:
+                    raise ValueError('op should be > or < or >= or <=')
             if not only_preds:
                 region[feature] = [lb,ub]
             elif len(pred_having_feature) != 0:
@@ -133,19 +135,6 @@ class Rule:
             if not np.isinf(ub):
                 new_preds.append((feature,'<=',ub))
         
-        new_id = str(self.id) + str(another_rule.id)
+        new_id = int(str(self.id) + str(another_rule.id))
         return Rule(new_id,new_preds,new_class_label)
-
-    
-
-
-
-        
-
-
-
-
-              
-
-    
     

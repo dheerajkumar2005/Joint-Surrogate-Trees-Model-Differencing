@@ -181,5 +181,5 @@ class Rule:
             if not np.isinf(right):
                 new_preds.append((key, '<=', right))
 
-        new_id = str(self._id) + str(another_leaf._id)
+        new_id = int(str(self._id) + str(another_leaf._id))
         return Rule(new_id, new_preds, new_class_label)
