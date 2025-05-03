@@ -78,6 +78,7 @@ class IMDExplainer(DISExplainer):
                                     split_criterion=split_criterion,
                                     alpha=alpha)
         t1, t2 = jstobj.fit(x1, y1, x2, y2)
+        
         ct = jstobj.common_trunk(t1, t2)
         diffrules = jstobj.get_diffrules_from_jst(ct)
 

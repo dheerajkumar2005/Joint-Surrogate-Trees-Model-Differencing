@@ -65,8 +65,6 @@ class JointSurrogateTree:
         self.max_depth = max_depth
         self.feature_names = feature_names
 
-        self.tree1 = None
-        self.tree2 = None
         if split_criterion == 1:
             self.continue_same_prefix = self.split_condition
         else:
@@ -183,7 +181,7 @@ class JointSurrogateTree:
         if isinstance(y, pd.Series):
             y = y.to_numpy()
         if len(y) == 0: return True
-        else: return len(np.unique(y) == 1)
+        else: return len(np.unique(y)) == 1
     
     def make_st(self, x, y , path=None, depth = 0):
         if path is None:
@@ -223,6 +221,7 @@ class JointSurrogateTree:
             return self.make_st(x1,y1,path,depth),None
         
         if self.is_split_pure(y1) and self.is_split_pure(y2):
+            
             return {'val': y1[0], 'depth': depth, 'ispure': True, 'dist': np.bincount(y1), 'path': path},\
                    {'val': y2[0], 'depth': depth, 'ispure': True, 'dist': np.bincount(y2), 'path': path }
 
@@ -272,11 +271,6 @@ class JointSurrogateTree:
             split_node_1['left'], split_node_2['left']  = self.make_jst(x1_left,y1_left,x2_left,y2_left,left_path,depth+1)
             split_node_1['right'], split_node_2['right']  = self.make_jst(x1_right,y1_right,x2_right,y2_right,right_path,depth+1)
 
-            # self.depth1 += 1
-            # self.depth2 += 1
-
-            self.tree1 = split_node_1
-            self.tree2 = split_node_2
 
         else:
             y1_left = y1[x1[:,col1] < cutoff1]
