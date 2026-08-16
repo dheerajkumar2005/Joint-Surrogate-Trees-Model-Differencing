@@ -11,10 +11,26 @@ class IMDExplainer:
         self.diff_regions = []
         self.feature_names = []
         
+    def convert_regression_to_classification(self,y1, y2, th1 = 0.1, th2=50):
+    # Compute signs
+        same_sign = (y1 * y2) > 0
+        normalized_diff = np.abs(y1 - y2) / np.abs(y1 + y2)
+        absolute_diff = np.abs(y1 - y2)
+        
+        result = np.where(
+            same_sign,
+            normalized_diff > th1,  
+            absolute_diff > th2  
+        )
 
-    def fit(self, X_train: pd.DataFrame, Y1, Y2, max_depth = 6, split_criterion = 1, alpha = 0.25, verbose = True):
+        y1 = np.where(result, 0, 0)  
+        y2 = np.where(result, 1, 0)   
+
+        return y1,y2
+
+    def fit(self, X_train: pd.DataFrame, Y1, Y2,max_depth = 6, split_criterion = 1, alpha = 0.25, task = 'classification',regr_threshold1 = 0.1,regr_threshold2 = 50,verbose = True):
         self.feature_names = X_train.columns.to_list()
-
+        self.task = task
         x1 = x2 = X_train.to_numpy()
 
         if not isinstance(Y1, np.ndarray):
@@ -22,9 +38,11 @@ class IMDExplainer:
         if not isinstance(Y2, np.ndarray):
             Y2 = Y2.to_numpy()
 
-        y1 = Y1
-        y2 = Y2
-
+        if task == 'classification':
+            y1 = Y1
+            y2 = Y2
+        elif task == 'regression':
+            y1,y2 = self.convert_regression_to_classification(Y1,Y2,regr_threshold1,regr_threshold2)
         ydiff = (y1 != y2).astype(int)
 
         
@@ -76,9 +94,13 @@ class IMDExplainer:
         if self.jst is None:
             print("jst not fitted yet, please call .fit method first!")
             return {}
-        
+        if self.task == 'classification':
+            y_test1_, y_test2_ = y_test1, y_test2
+        if self.task == 'regression':
+            y_test1_, y_test2_ = self.convert_regression_to_classification(y_test1,y_test2)  
+
         metrics = {}
-        diff_samples = y_test1 != y_test2
+        diff_samples = y_test1_ != y_test2_
 
         total_no_diff_samples = np.sum(diff_samples).astype(int)
 
@@ -91,8 +113,11 @@ class IMDExplainer:
         in_region_all = self.in_region(self.diff_regions,x_test.to_numpy())
         samples_in_region = np.sum(in_region_all).astype(int)
 
-        metrics[name + "-precision"] = np.round(diff_samples_in_region / samples_in_region, 6)
-        metrics[name + "-recall"] = np.round(diff_samples_in_region / total_no_diff_samples,6)
+        pr =  np.round(diff_samples_in_region / samples_in_region, 6)
+        re = np.round(diff_samples_in_region / total_no_diff_samples,6) if total_no_diff_samples !=0 else 1.0
+        metrics[name + "-precision"] = pr
+        metrics[name + "-recall"] = re
+        metrics[name + "-F1"] = np.round(2*pr*re/(pr+re),4)
         metrics["num-rules"] = len(self.diff_regions)
 
         preds = []

@@ -94,8 +94,8 @@ class JointSurrogateTree:
         return ((impurity1 > 0) and (impurity2 > 0))
     
     def split_condition2(self,impurity1,impurity2,impurity):
-        if impurity1 < 0 or impurity2 < 0 or impurity < 0:
-            return True
+        if impurity1 <= 0 or impurity2 <= 0 or impurity <= 0:
+            return False
         im_avg = (impurity1 + impurity2) / 2
         return self.alpha*impurity < im_avg
     
@@ -242,9 +242,7 @@ class JointSurrogateTree:
         col1, cutoff1, impurity1 = self.find_best_feature_to_split_for_st(x1,y1)
         col2, cutoff2, impurity2 = self.find_best_feature_to_split_for_st(x2,y2)
         col, cutoff, impurity = self.find_best_feature_to_split_for_jst(x1,y1,x2,y2)
-
-        if self.continue_same_prefix(impurity1, impurity2, impurity):
-
+        if self.continue_same_prefix(impurity1, impurity2, impurity):            
             split_node_1 = {
                             'col': self.feature_names[col], 'index_col': col, 'cutoff': cutoff,
                             'val': np.argmax(np.bincount(y1)), 'depth': depth, 'dist': np.bincount(y1)
