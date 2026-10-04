@@ -5,9 +5,8 @@
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![IIT Bombay](https://img.shields.io/badge/IIT%20Bombay-CSE%20AIML-red.svg)](https://www.cse.iitb.ac.in/)
 
-> **Academic Affiliation**: Course Project for **Artificial Intelligence and Machine Learning (CS 725 / CS 337)**, IIT Bombay  
+> **Academic Affiliation**: Course Project for **Artificial Intelligence and Machine Learning (CS 240)**, IIT Bombay  
 > **Guide**: **Prof. Pushpak Bhattacharyya**  
-> **Author**: **Dheeraj Kumar Maradana** ([@dheerajkumar2005](https://github.com/dheerajkumar2005))
 
 ---
 
